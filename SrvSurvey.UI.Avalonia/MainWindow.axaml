@@ -8,6 +8,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
+                <MenuItem Header="Select Journal Folder..." Click="OnSelectFolderClick" />
+                <Separator />
                 <MenuItem Header="Exit" Click="OnExitClick" />
             </MenuItem>
         </Menu>
