@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SrvSurvey.UI.Avalonia.Views.SystemStatusOverlay"
+        SystemDecorations="None"
+        ShowInTaskbar="False"
+        Topmost="True"
+        CanResize="False"
+        TransparencyLevelHint="Transparent"
+        Background="#00000000"
+        Width="200"
+        Height="60">
+  <Border Background="#CC1E1E1E" CornerRadius="6" Padding="10">
+    <StackPanel Spacing="4">
+      <TextBlock Name="TxtHeader" Text="System Status" FontSize="10" Opacity="0.7"/>
+      <TextBlock Name="TxtStatus" Text="FSS not started" FontSize="12" Foreground="#00FFFF"/>
+    </StackPanel>
+  </Border>
+</Window>

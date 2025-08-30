@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private JournalProcessor? _processor;
     private Timer? _timeTimer;
     private FloatieWindow? _floatie;
+    private SystemStatusOverlay? _systemStatus;
     public MainWindow()
     {
         InitializeComponent();
@@ -200,6 +201,23 @@ public partial class MainWindow : Window
 
         _floatie ??= new FloatieWindow();
         _floatie.ShowMessage(string.Join(" > ", parts));
+        
+        // Update system status overlay
+        UpdateSystemStatusOverlay(s);
+    }
+    
+    private void UpdateSystemStatusOverlay(GameState s)
+    {
+        if (string.IsNullOrWhiteSpace(s.StarSystem)) return;
+        
+        _systemStatus ??= new SystemStatusOverlay();
+        
+        var status = s.StarSystem;
+        if (!string.IsNullOrWhiteSpace(s.Body))
+            status += $" > {s.Body}";
+            
+        _systemStatus.UpdateStatus(status, "System Status");
+        _systemStatus.ShowOverlay();
     }
     
     protected override void OnClosed(EventArgs e)
