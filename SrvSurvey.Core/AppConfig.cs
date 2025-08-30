@@ -11,6 +11,7 @@ public static class AppConfig
 {
     private static readonly object _sync = new();
     private static AppSettings? _cached;
+    public static event Action<AppSettings>? SettingsChanged;
 
     public static string GetConfigFilepath()
     {
@@ -72,6 +73,7 @@ public static class AppConfig
             var path = GetConfigFilepath();
             var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
             File.WriteAllText(path, json);
+            SettingsChanged?.Invoke(settings);
         }
     }
 }
