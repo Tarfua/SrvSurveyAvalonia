@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SrvSurvey.UI.Avalonia.Views.FormGroundTarget"
+        Title="Set Ground Target"
+        Width="320"
+        Height="200"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
+  <Grid Margin="20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Title -->
+    <TextBlock Grid.Row="0" Text="Set Ground Target" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
+
+    <!-- Latitude -->
+    <Grid Grid.Row="1" Margin="0,0,0,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="80"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="Latitude:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+      <TextBox Grid.Column="1" Name="TxtLat" Margin="10,0,0,0" HorizontalAlignment="Stretch"/>
+    </Grid>
+
+    <!-- Longitude -->
+    <Grid Grid.Row="2" Margin="0,0,0,15">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="80"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="Longitude:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+      <TextBox Grid.Column="1" Name="TxtLong" Margin="10,0,0,0" HorizontalAlignment="Stretch"/>
+    </Grid>
+
+    <!-- Quick buttons -->
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,0,0,20">
+      <Button Name="BtnTargetCurrent" Content="Use Current Position" Click="BtnTargetCurrent_Click"/>
+      <Button Name="BtnPaste" Content="Paste from Clipboard" Click="BtnPaste_Click"/>
+    </StackPanel>
+
+    <!-- Buttons -->
+    <StackPanel Grid.Row="5" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+      <Button Name="BtnClear" Content="Clear Target" Click="BtnClear_Click"/>
+      <Button Name="BtnCancel" Content="Cancel" Click="BtnCancel_Click"/>
+      <Button Name="BtnBegin" Content="Set Target" Click="BtnBegin_Click" IsDefault="True"/>
+    </StackPanel>
+  </Grid>
+</Window>
