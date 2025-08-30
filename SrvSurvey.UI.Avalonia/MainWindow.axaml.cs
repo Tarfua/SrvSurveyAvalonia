@@ -57,7 +57,16 @@ public partial class MainWindow : Window
     private void SetupEventHandlers()
     {
         Logging.Message += AppendLog;
-        _state.Changed += s => { UpdateGameStatus(s); ShowFloatieForState(s); };
+        _state.Changed += s =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                UpdateGameStatus(s);
+            });
+
+            // ShowFloatieForState already handles its own UI thread safety
+            ShowFloatieForState(s);
+        };
         AppConfig.SettingsChanged += OnSettingsChanged;
     }
     
@@ -151,36 +160,33 @@ public partial class MainWindow : Window
 
     private void UpdateGameStatus(GameState s)
     {
-        Dispatcher.UIThread.InvokeAsync(() =>
+        // Update individual status fields
+        if (_txtSystem != null) _txtSystem.Text = s.StarSystem ?? "Unknown";
+        if (_txtBody != null) _txtBody.Text = s.Body ?? "Unknown";
+        if (_txtLatitude != null) _txtLatitude.Text = s.Latitude?.ToString("F6") ?? "Unknown";
+        if (_txtLongitude != null) _txtLongitude.Text = s.Longitude?.ToString("F6") ?? "Unknown";
+
+        // Update connection status
+        if (_txtConnection != null)
         {
-            // Update individual status fields
-            if (_txtSystem != null) _txtSystem.Text = s.StarSystem ?? "Unknown";
-            if (_txtBody != null) _txtBody.Text = s.Body ?? "Unknown";
-            if (_txtLatitude != null) _txtLatitude.Text = s.Latitude?.ToString("F6") ?? "Unknown";
-            if (_txtLongitude != null) _txtLongitude.Text = s.Longitude?.ToString("F6") ?? "Unknown";
-            
-            // Update connection status
-            if (_txtConnection != null)
+            _txtConnection.Text = "Connected";
+            _txtConnection.Foreground = new SolidColorBrush(Color.FromRgb(92, 184, 92)); // Green
+        }
+
+        // Update main status bar
+        if (_txtStatus != null)
+        {
+            var sys = s.StarSystem ?? "Unknown";
+            var body = s.Body ?? "Unknown";
+            if (s.Latitude.HasValue && s.Longitude.HasValue)
             {
-                _txtConnection.Text = "Connected";
-                _txtConnection.Foreground = new SolidColorBrush(Color.FromRgb(92, 184, 92)); // Green
+                _txtStatus.Text = $"📍 {sys} > {body} ({s.Latitude:F4}, {s.Longitude:F4})";
             }
-            
-            // Update main status bar
-            if (_txtStatus != null)
+            else
             {
-                var sys = s.StarSystem ?? "Unknown";
-                var body = s.Body ?? "Unknown";
-                if (s.Latitude.HasValue && s.Longitude.HasValue)
-                {
-                    _txtStatus.Text = $"📍 {sys} > {body} ({s.Latitude:F4}, {s.Longitude:F4})";
-                }
-                else
-                {
-                    _txtStatus.Text = $"🚀 {sys} > {body}";
-                }
+                _txtStatus.Text = $"🚀 {sys} > {body}";
             }
-        });
+        }
     }
     
     private void UpdateTime()
@@ -196,35 +202,39 @@ public partial class MainWindow : Window
 
     private void ShowFloatieForState(GameState s)
     {
-        // Show small overlay when system/body changes
-        var parts = new System.Collections.Generic.List<string>();
-        if (!string.IsNullOrWhiteSpace(s.StarSystem)) parts.Add(s.StarSystem!);
-        if (!string.IsNullOrWhiteSpace(s.Body)) parts.Add(s.Body!);
-        if (parts.Count == 0) return;
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            // Show small overlay when system/body changes
+            var parts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrWhiteSpace(s.StarSystem)) parts.Add(s.StarSystem!);
+            if (!string.IsNullOrWhiteSpace(s.Body)) parts.Add(s.Body!);
+            if (parts.Count == 0) return;
 
-        _floatie ??= new FloatieWindow();
-        _floatie.ShowMessage(string.Join(" > ", parts));
-        
-        // Update system status overlay
-        UpdateSystemStatusOverlay(s);
-        
-        // Update bio status overlay
-        UpdateBioStatusOverlay(s);
-        
-        // Update colony commodities overlay
-        UpdateColonyCommoditiesOverlay(s);
+            _floatie ??= new FloatieWindow();
+            _floatie.ShowMessage(string.Join(" > ", parts));
+
+            // Update system status overlay
+            UpdateSystemStatusOverlay(s);
+
+            // Update bio status overlay
+            UpdateBioStatusOverlay(s);
+
+            // Update colony commodities overlay
+            UpdateColonyCommoditiesOverlay(s);
+        });
     }
     
     private void UpdateSystemStatusOverlay(GameState s)
     {
         if (string.IsNullOrWhiteSpace(s.StarSystem)) return;
-        
-        _systemStatus ??= new SystemStatusOverlay();
-        
+
+        if (_systemStatus == null)
+            _systemStatus = new SystemStatusOverlay();
+
         var status = s.StarSystem;
         if (!string.IsNullOrWhiteSpace(s.Body))
             status += $" > {s.Body}";
-            
+
         _systemStatus.UpdateStatus(status, "System Status");
         _systemStatus.ShowOverlay();
     }
@@ -232,9 +242,10 @@ public partial class MainWindow : Window
     private void UpdateBioStatusOverlay(GameState s)
     {
         if (string.IsNullOrWhiteSpace(s.Body)) return;
-        
-        _bioStatus ??= new BioStatusOverlay();
-        
+
+        if (_bioStatus == null)
+            _bioStatus = new BioStatusOverlay();
+
         // For now, show basic body info
         // TODO: Add bio signal count and temperature from journal events
         _bioStatus.UpdateBioStatus(s.Body, 0, null);
@@ -245,8 +256,9 @@ public partial class MainWindow : Window
     {
         // For now, show sample colony data
         // TODO: Integrate with actual colony data from journal events
-        _colonyCommodities ??= new ColonyCommoditiesOverlay();
-        
+        if (_colonyCommodities == null)
+            _colonyCommodities = new ColonyCommoditiesOverlay();
+
         var sampleCommodities = new Dictionary<string, int>
         {
             { "Aluminium", 10055 },
@@ -255,7 +267,7 @@ public partial class MainWindow : Window
             { "Ceramic Composites", 1207 },
             { "Polymers", 1046 }
         };
-        
+
         _colonyCommodities.UpdateCommodities(sampleCommodities, "Sample Colony Project");
         _colonyCommodities.ShowOverlay();
     }
