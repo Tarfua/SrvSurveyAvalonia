@@ -1,10 +1,20 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SrvSurvey.Core;
 
 public sealed class AppSettings
 {
     public string? JournalFolder { get; set; }
+    public Dictionary<string, OverlaySettings>? OverlayPositions { get; set; }
+}
+
+public class OverlaySettings
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public string HorizontalAlign { get; set; } = "Center";
+    public string VerticalAlign { get; set; } = "Middle";
 }
 
 public static class AppConfig

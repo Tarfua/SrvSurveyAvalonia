@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Collections.Generic;
 using System;
+using SrvSurvey.Core;
 
 namespace SrvSurvey.UI.Avalonia.Views;
 
@@ -185,23 +186,51 @@ public partial class FormAdjustOverlay : Window
         CheckMiddle.IsChecked = true;
     }
 
-    private Dictionary<string, OverlayPosition> LoadOverlaySettings()
+    private Dictionary<string, Core.OverlaySettings> LoadOverlaySettings()
     {
-        // TODO: Load from persistent storage
-        // For now, return empty dictionary
-        return new Dictionary<string, OverlayPosition>();
+        var settings = AppConfig.Load();
+        var result = new Dictionary<string, Core.OverlaySettings>();
+
+        if (settings.OverlayPositions != null)
+        {
+            foreach (var kvp in settings.OverlayPositions)
+            {
+                result[kvp.Key] = new Core.OverlaySettings
+                {
+                    X = kvp.Value.X,
+                    Y = kvp.Value.Y,
+                    HorizontalAlign = kvp.Value.HorizontalAlign,
+                    VerticalAlign = kvp.Value.VerticalAlign
+                };
+            }
+        }
+
+        return result;
     }
 
-    private void SaveOverlaySettings(string overlayName, OverlayPosition position)
+    private void SaveOverlaySettings(string overlayName, Core.OverlaySettings position)
     {
-        // TODO: Save to persistent storage
-        // For now, just log the settings
-        Console.WriteLine($"Saving position for {overlayName}: X={position.X}, Y={position.Y}, H={position.HorizontalAlign}, V={position.VerticalAlign}");
+        var settings = AppConfig.Load();
+
+        if (settings.OverlayPositions == null)
+        {
+            settings.OverlayPositions = new Dictionary<string, Core.OverlaySettings>();
+        }
+
+        settings.OverlayPositions[overlayName] = new Core.OverlaySettings
+        {
+            X = position.X,
+            Y = position.Y,
+            HorizontalAlign = position.HorizontalAlign,
+            VerticalAlign = position.VerticalAlign
+        };
+
+        AppConfig.Save(settings);
     }
 
-    private OverlayPosition GetCurrentPosition()
+    private Core.OverlaySettings GetCurrentPosition()
     {
-        var position = new OverlayPosition();
+        var position = new Core.OverlaySettings();
 
         if (double.TryParse(TxtX.Text, out var x)) position.X = x;
         if (double.TryParse(TxtY.Text, out var y)) position.Y = y;
@@ -219,7 +248,6 @@ public partial class FormAdjustOverlay : Window
 
     private void BtnAccept_Click(object? sender, RoutedEventArgs e)
     {
-        // TODO: Save position settings
         if (!string.IsNullOrEmpty(TargetName))
         {
             var position = GetCurrentPosition();
@@ -230,10 +258,4 @@ public partial class FormAdjustOverlay : Window
     }
 }
 
-public class OverlayPosition
-{
-    public double X { get; set; }
-    public double Y { get; set; }
-    public string HorizontalAlign { get; set; } = "Center";
-    public string VerticalAlign { get; set; } = "Middle";
-}
+
