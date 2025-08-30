@@ -9,6 +9,39 @@ The application works by analyzing journal files written by the game when played
 
 
 
+# Linux (Avalonia) build
+
+This repository now contains an experimental cross‑platform UI built with Avalonia, alongside the existing Windows Forms app. The Avalonia app is minimal for now but compiles and runs on Linux.
+
+## Build (Linux)
+
+Prerequisites: .NET SDK 8.
+
+Steps:
+
+1. Build the Avalonia app only:
+
+   ```bash
+   export PATH="$HOME/.dotnet:$PATH"
+   dotnet build SrvSurvey.UI.Avalonia/SrvSurvey.UI.Avalonia.csproj -c Release
+   ```
+
+2. Publish self‑contained single‑file binary (linux‑x64):
+
+   ```bash
+   dotnet publish SrvSurvey.UI.Avalonia/SrvSurvey.UI.Avalonia.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o publish/linux
+   ```
+
+3. Run:
+
+   ```bash
+   ./publish/linux/SrvSurvey.UI.Avalonia
+   ```
+
+Notes:
+- The legacy Windows Forms app remains Windows‑only and will fail to restore on Linux.
+- Cross‑platform services (clipboard, hotkeys, input devices) are stubbed; functionality will be ported incrementally.
+
 # Installation
 
 Srv Survey is distributed two ways:

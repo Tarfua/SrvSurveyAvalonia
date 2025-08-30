@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SrvSurvey", "SrvSurvey\SrvS
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "SrvSurvey.Package", "SrvSurvey.Package\SrvSurvey.Package.wapproj", "{7ACA3CF3-6EFD-4484-848A-FF3372C7FB31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SrvSurvey.Core", "SrvSurvey.Core\SrvSurvey.Core.csproj", "{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SrvSurvey.UI.Avalonia", "SrvSurvey.UI.Avalonia\SrvSurvey.UI.Avalonia.csproj", "{2DDF03C2-E8CD-486B-B6CF-A654748EE098}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -48,6 +52,22 @@ Global
 		{7ACA3CF3-6EFD-4484-848A-FF3372C7FB31}.Release|x64.Build.0 = Release|x64
 		{7ACA3CF3-6EFD-4484-848A-FF3372C7FB31}.Release|x64.Deploy.0 = Release|x64
 		{7ACA3CF3-6EFD-4484-848A-FF3372C7FB31}.ReleaseOnce|x64.ActiveCfg = ReleaseOnce|x64
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.Debug|x64.Build.0 = Debug|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.DebugNoPS|x64.ActiveCfg = Debug|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.DebugNoPS|x64.Build.0 = Debug|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.Release|x64.Build.0 = Release|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.ReleaseOnce|x64.ActiveCfg = Debug|Any CPU
+		{4A104316-C0CD-46BE-BCD2-55FCD1DE306E}.ReleaseOnce|x64.Build.0 = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.Debug|x64.Build.0 = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.DebugNoPS|x64.ActiveCfg = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.DebugNoPS|x64.Build.0 = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.Release|x64.ActiveCfg = Release|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.Release|x64.Build.0 = Release|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.ReleaseOnce|x64.ActiveCfg = Debug|Any CPU
+		{2DDF03C2-E8CD-486B-B6CF-A654748EE098}.ReleaseOnce|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
