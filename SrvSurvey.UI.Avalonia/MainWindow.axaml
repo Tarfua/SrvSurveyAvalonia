@@ -7,7 +7,7 @@
         x:Class="SrvSurvey.UI.Avalonia.MainWindow"
         Title="SrvSurvey - Elite Dangerous Survey Tool"
         MinWidth="800" MinHeight="600"
-        Icon="/icons/logo.ico">
+        Icon="Assets/icons/logo.ico">
     
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- Header -->
