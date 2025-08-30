@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SrvSurvey.UI.Avalonia.Views.FormAdjustOverlay"
+        Title="Adjust Overlay Positions"
+        Width="450"
+        Height="400"
+        CanResize="True"
+        WindowStartupLocation="CenterScreen">
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="15">
+
+      <!-- Choose overlay -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="Choose an overlay:" FontWeight="Bold"/>
+        <ComboBox Name="ComboPlotter" SelectedIndex="0">
+          <ComboBoxItem>Choose an overlay...</ComboBoxItem>
+        </ComboBox>
+      </StackPanel>
+
+      <!-- Show all checkbox -->
+      <CheckBox Name="CheckShowAll" Content="Show all overlays"/>
+
+      <!-- Position controls -->
+      <Border Background="#2d2d30" Padding="10" CornerRadius="4">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Position" FontWeight="Bold" FontSize="14"/>
+
+          <!-- Horizontal position -->
+          <StackPanel Spacing="8">
+            <TextBlock Text="Horizontal:" FontWeight="SemiBold"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <CheckBox Name="CheckLeft" Content="Left"/>
+              <CheckBox Name="CheckCenter" Content="Center" IsChecked="True"/>
+              <CheckBox Name="CheckRight" Content="Right"/>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Vertical position -->
+          <StackPanel Spacing="8">
+            <TextBlock Text="Vertical:" FontWeight="SemiBold"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <CheckBox Name="CheckTop" Content="Top"/>
+              <CheckBox Name="CheckMiddle" Content="Middle" IsChecked="True"/>
+              <CheckBox Name="CheckBottom" Content="Bottom"/>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Offset -->
+          <StackPanel Spacing="8">
+            <TextBlock Text="Offset:" FontWeight="SemiBold"/>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="80"/>
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="X:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+              <TextBox Grid.Column="1" Name="TxtX" Text="0" HorizontalAlignment="Stretch"/>
+              <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="10,0,5,0"/>
+              <TextBox Grid.Column="3" Name="TxtY" Text="0" HorizontalAlignment="Stretch"/>
+            </Grid>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Screen-relative positioning -->
+      <Border Background="#2d2d30" Padding="10" CornerRadius="4">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Screen Position" FontWeight="Bold" FontSize="14"/>
+          <StackPanel Orientation="Horizontal" Spacing="15">
+            <CheckBox Name="CheckHScreen" Content="Use screen width"/>
+            <CheckBox Name="CheckVScreen" Content="Use screen height"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Opacity -->
+      <Border Background="#2d2d30" Padding="10" CornerRadius="4">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Appearance" FontWeight="Bold" FontSize="14"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <CheckBox Name="CheckOpacity" Content="Enable opacity"/>
+            <TextBlock Text="Opacity:" VerticalAlignment="Center"/>
+            <TextBox Name="TxtOpacity" Text="80" Width="60" HorizontalAlignment="Stretch"/>
+            <TextBlock Text="%" VerticalAlignment="Center"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Buttons -->
+      <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,10,0,0">
+        <Button Name="BtnReset" Content="Reset" Click="BtnReset_Click"/>
+        <Button Name="BtnCancel" Content="Cancel" Click="BtnCancel_Click"/>
+        <Button Name="BtnAccept" Content="Save" Click="BtnAccept_Click" IsDefault="True"/>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>
