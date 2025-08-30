@@ -1,0 +1,58 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Cursor Rules for SrvSurvey (Linux port)
+
+## Goals
+- Keep the Linux port stable and reproducible.
+- Always verify builds and package outputs before concluding a task.
+
+## Golden workflow
+1) Before editing: create/update a small todo and state the next step.
+2) Make edits using file edits only (no large code dumps in chat).
+3) After any non-trivial edit:
+   - Build only the cross‑platform UI:
+     - `dotnet build SrvSurvey.UI.Avalonia/SrvSurvey.UI.Avalonia.csproj -c Debug`
+   - If publishing/packaging changed, run the full deploy:
+     - `./scripts/deploy-linux.sh`
+4) If build succeeds, immediately commit with a clear message:
+   - `git add -A && git commit -m "<type>(scope): <summary>"`
+   - Use conventional commits where possible (feat, fix, chore, refactor, docs, build, ci).
+5) Only then summarize changes and proceed to the next step.
+
+## Packaging
+- Linux packaging is produced by `scripts/deploy-linux.sh`.
+- Do NOT commit build artifacts:
+  - `publish/`, `dist/`, `*.deb` are ignored in `.gitignore`.
+
+## Scope policy
+- New functionality must target `SrvSurvey.Core` and `SrvSurvey.UI.Avalonia`.
+- Do not increase coupling with Windows‑only APIs (WinForms, WinAPI, SharpDX).
+- Prefer cross‑platform alternatives (Avalonia, Skia, SharpHook, SDL/HIDSharp).
+
+## UI/UX policy
+- Use Avalonia Fluent theme; keep layouts simple and responsive.
+- Prefer tabs/panels for major areas (Logs, Settings, …).
+- Keep spacing/padding consistent; avoid pixel magic numbers.
+
+## Coding policy
+- .NET 8, nullable enabled.
+- Descriptive names, clear control flow, early returns.
+- Minimal comments that explain "why", not "how".
+
+## Build commands (reference)
+- Debug build:
+  - `dotnet build SrvSurvey.UI.Avalonia/SrvSurvey.UI.Avalonia.csproj -c Debug`
+- Release build:
+  - `dotnet build SrvSurvey.UI.Avalonia/SrvSurvey.UI.Avalonia.csproj -c Release`
+- Full Linux deploy (.deb + publish):
+  - `./scripts/deploy-linux.sh`
+
+## Acceptance checklist per change
+- [ ] Compiles locally (Debug or Release as appropriate)
+- [ ] If packaging touched, `.deb` rebuilt successfully
+- [ ] Changes committed with a clear message
+- [ ] Brief summary provided

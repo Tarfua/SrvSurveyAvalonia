@@ -6,5 +6,14 @@
 
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+        <Style Selector="TabControl">
+            <Setter Property="Padding" Value="12"/>
+        </Style>
     </Application.Styles>
 </Application>
