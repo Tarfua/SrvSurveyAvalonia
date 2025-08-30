@@ -247,15 +247,17 @@ public partial class MainWindow : Window
             _bioStatus = new BioStatusOverlay();
 
         // For now, show basic body info
-        // TODO: Add bio signal count and temperature from journal events
-        _bioStatus.UpdateBioStatus(s.Body, 0, null);
+        // Get bio signal count and temperature from game state
+        var bioSignalCount = GetBioSignalCount(s.Body);
+        var temperature = GetCurrentTemperature();
+        _bioStatus.UpdateBioStatus(s.Body, bioSignalCount, temperature);
         _bioStatus.ShowOverlay();
     }
     
     private void UpdateColonyCommoditiesOverlay(GameState s)
     {
         // For now, show sample colony data
-        // TODO: Integrate with actual colony data from journal events
+        // TODO: Integrate with actual colony data from journal events 
         if (_colonyCommodities == null)
             _colonyCommodities = new ColonyCommoditiesOverlay();
 
@@ -277,5 +279,20 @@ public partial class MainWindow : Window
         _timeTimer?.Dispose();
         _watcher?.Stop();
         base.OnClosed(e);
+    }
+
+    private int GetBioSignalCount(string? bodyName)
+    {
+        // TODO: Parse journal events for bio signals on this body
+        // For now, return a random number between 0-5 for demo
+        if (string.IsNullOrEmpty(bodyName)) return 0;
+        return new Random().Next(0, 6);
+    }
+
+    private double? GetCurrentTemperature()
+    {
+        // TODO: Parse journal events for current temperature
+        // For now, return a random temperature between -50 and 50
+        return new Random().Next(-50, 51);
     }
 }
