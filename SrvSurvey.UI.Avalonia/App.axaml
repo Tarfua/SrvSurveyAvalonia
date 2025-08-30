@@ -6,14 +6,71 @@
 
     <Application.Styles>
         <FluentTheme />
+        
+        <!-- Modern color scheme -->
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#1e1e1e"/>
+        </Style>
+        
         <Style Selector="TextBlock">
-            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
         </Style>
+        
         <Style Selector="Button">
-            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Background" Value="#007acc"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
+        
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="#1f9bcf"/>
+        </Style>
+        
+        <Style Selector="Button:pressed">
+            <Setter Property="Background" Value="#005a9e"/>
+        </Style>
+        
         <Style Selector="TabControl">
-            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Background" Value="#252526"/>
+        </Style>
+        
+        <Style Selector="TabItem">
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Background" Value="#2d2d30"/>
+            <Setter Property="Foreground" Value="#cccccc"/>
+        </Style>
+        
+        <Style Selector="TabItem:selected">
+            <Setter Property="Background" Value="#007acc"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+        </Style>
+        
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#3c3c3c"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="BorderBrush" Value="#454545"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="ScrollViewer">
+            <Setter Property="Background" Value="#1e1e1e"/>
+        </Style>
+        
+        <!-- Status bar styling -->
+        <Style Selector="Border.status-bar">
+            <Setter Property="Background" Value="#007acc"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="Border.status-bar TextBlock">
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
     </Application.Styles>
 </Application>

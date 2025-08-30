@@ -1,10 +1,47 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="SrvSurvey.UI.Avalonia.Views.SettingsView">
-  <StackPanel Margin="12" Spacing="8">
-    <TextBlock Text="Journal folder"/>
-    <TextBox Name="TxtFolder" IsReadOnly="True"/>
-    <Button Content="Browse..." Click="OnBrowseClick" Width="120"/>
+  <StackPanel Spacing="20">
+    <!-- Journal Folder Section -->
+    <Border Background="#3c3c3c" CornerRadius="6" Padding="16">
+      <StackPanel Spacing="12">
+        <TextBlock Text="📁 Elite Dangerous Journal Folder" FontSize="14" FontWeight="SemiBold"/>
+        <TextBlock Text="Select the folder where Elite Dangerous stores journal files" FontSize="12" Opacity="0.8"/>
+        
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <TextBox Grid.Column="0" Name="TxtFolder" IsReadOnly="True" 
+                   Watermark="No folder selected..."/>
+          <Button Grid.Column="1" Content="📁 Browse" Click="OnBrowseClick" 
+                  MinWidth="100"/>
+        </Grid>
+        
+        <TextBlock Name="TxtFolderStatus" FontSize="11" Opacity="0.7"/>
+      </StackPanel>
+    </Border>
+    
+    <!-- Information Section -->
+    <Border Background="#3c3c3c" CornerRadius="6" Padding="16">
+      <StackPanel Spacing="12">
+        <TextBlock Text="ℹ️ Information" FontSize="14" FontWeight="SemiBold"/>
+        <StackPanel Spacing="8">
+          <TextBlock FontSize="12" Opacity="0.8">
+            <Run Text="• Journal files are typically located in:"/>
+          </TextBlock>
+          <TextBlock FontSize="11" Opacity="0.7" Margin="16,0,0,0" FontFamily="Consolas,Monaco,monospace">
+            <Run Text="Windows: %USERPROFILE%\Saved Games\Frontier Developments\Elite Dangerous"/>
+          </TextBlock>
+          <TextBlock FontSize="11" Opacity="0.7" Margin="16,0,0,0" FontFamily="Consolas,Monaco,monospace">
+            <Run Text="Linux: ~/.local/share/Steam/steamapps/compatdata/359320/pfx/drive_c/users/steamuser/Saved Games/Frontier Developments/Elite Dangerous"/>
+          </TextBlock>
+          <TextBlock FontSize="12" Opacity="0.8" Margin="0,8,0,0">
+            <Run Text="• SrvSurvey monitors journal files for real-time game data"/>
+          </TextBlock>
+          <TextBlock FontSize="12" Opacity="0.8">
+            <Run Text="• Changes are automatically detected and processed"/>
+          </TextBlock>
+        </StackPanel>
+      </StackPanel>
+    </Border>
   </StackPanel>
 </UserControl>
 
