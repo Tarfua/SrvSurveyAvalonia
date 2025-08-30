@@ -9,6 +9,7 @@ using System.Threading;
 using System;
 using Avalonia.Media;
 using SrvSurvey.UI.Avalonia.Views;
+using System.Collections.Generic;
 
 namespace SrvSurvey.UI.Avalonia;
 
@@ -30,6 +31,7 @@ public partial class MainWindow : Window
     private FloatieWindow? _floatie;
     private SystemStatusOverlay? _systemStatus;
     private BioStatusOverlay? _bioStatus;
+    private ColonyCommoditiesOverlay? _colonyCommodities;
     public MainWindow()
     {
         InitializeComponent();
@@ -208,6 +210,9 @@ public partial class MainWindow : Window
         
         // Update bio status overlay
         UpdateBioStatusOverlay(s);
+        
+        // Update colony commodities overlay
+        UpdateColonyCommoditiesOverlay(s);
     }
     
     private void UpdateSystemStatusOverlay(GameState s)
@@ -234,6 +239,25 @@ public partial class MainWindow : Window
         // TODO: Add bio signal count and temperature from journal events
         _bioStatus.UpdateBioStatus(s.Body, 0, null);
         _bioStatus.ShowOverlay();
+    }
+    
+    private void UpdateColonyCommoditiesOverlay(GameState s)
+    {
+        // For now, show sample colony data
+        // TODO: Integrate with actual colony data from journal events
+        _colonyCommodities ??= new ColonyCommoditiesOverlay();
+        
+        var sampleCommodities = new Dictionary<string, int>
+        {
+            { "Aluminium", 10055 },
+            { "Steel", 14076 },
+            { "Titanium", 8205 },
+            { "Ceramic Composites", 1207 },
+            { "Polymers", 1046 }
+        };
+        
+        _colonyCommodities.UpdateCommodities(sampleCommodities, "Sample Colony Project");
+        _colonyCommodities.ShowOverlay();
     }
     
     protected override void OnClosed(EventArgs e)

@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SrvSurvey.UI.Avalonia.Views.ColonyCommoditiesOverlay"
+        SystemDecorations="None"
+        ShowInTaskbar="False"
+        Topmost="True"
+        CanResize="False"
+        TransparencyLevelHint="Transparent"
+        Background="#00000000"
+        Width="250"
+        Height="500">
+  <Border Background="#CC1E1E1E" CornerRadius="6" Padding="12">
+    <StackPanel Spacing="8">
+      <TextBlock Name="TxtHeader" Text="Colony Building" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF"/>
+      <TextBlock Name="TxtStatus" Text="No active projects" FontSize="10" Opacity="0.7"/>
+      <ScrollViewer Name="CommoditiesScroll" Height="400">
+        <StackPanel Name="CommoditiesPanel" Spacing="4">
+          <!-- Commodities will be added here dynamically -->
+        </StackPanel>
+      </ScrollViewer>
+      <TextBlock Name="TxtPending" Text="" FontSize="9" Opacity="0.6"/>
+    </StackPanel>
+  </Border>
+</Window>
