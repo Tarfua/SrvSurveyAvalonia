@@ -21,5 +21,8 @@
                 <views:SettingsView />
             </TabItem>
         </TabControl>
+        <Border DockPanel.Dock="Bottom" Padding="8" Margin="0,6,0,0">
+            <TextBlock Name="TxtStatus"/>
+        </Border>
     </DockPanel>
  </Window>

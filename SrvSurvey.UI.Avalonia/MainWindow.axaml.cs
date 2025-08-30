@@ -11,11 +11,16 @@ public partial class MainWindow : Window
 {
     private TextBox? _logsBox;
     private JournalWatcher? _watcher;
+    private TextBlock? _txtStatus;
+    private GameState _state = new GameState();
+    private JournalProcessor? _processor;
     public MainWindow()
     {
         InitializeComponent();
         _logsBox = this.FindControl<TextBox>("Logs");
+        _txtStatus = this.FindControl<TextBlock>("TxtStatus");
         Logging.Message += AppendLog;
+        _state.Changed += s => UpdateStatus(s);
         TryStartWatcher();
     }
 
@@ -70,6 +75,8 @@ public partial class MainWindow : Window
         Logging.Info($"Using journal folder: {folder}");
         _watcher = new JournalWatcher(folder);
         _watcher.Changed += file => Logging.Info($"Journal changed: {Path.GetFileName(file)}");
+        _processor ??= new JournalProcessor(_state);
+        _watcher.Changed += file => _processor!.ProcessDelta(file);
         _watcher.Start();
     }
 
@@ -78,5 +85,15 @@ public partial class MainWindow : Window
         if (_logsBox is null) return;
         _logsBox.Text += line + "\n";
         _logsBox.CaretIndex = _logsBox.Text?.Length ?? 0;
+    }
+
+    private void UpdateStatus(GameState s)
+    {
+        if (_txtStatus is null) return;
+        var sys = s.StarSystem ?? "?";
+        var body = s.Body ?? "?";
+        var lat = s.Latitude?.ToString("F4") ?? "?";
+        var lon = s.Longitude?.ToString("F4") ?? "?";
+        _txtStatus.Text = $"{sys} | {body} | {lat}, {lon}";
     }
 }
