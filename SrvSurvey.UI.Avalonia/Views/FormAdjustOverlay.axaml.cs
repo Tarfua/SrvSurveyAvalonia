@@ -106,51 +106,26 @@ public partial class FormAdjustOverlay : Window
 
     private void CheckHorizontal_CheckedChanged(object? sender, RoutedEventArgs e)
     {
-        if (_changing) return;
-
-        _changing = true;
-
-        // Ensure only one horizontal option is checked
-        if (sender == CheckLeft)
-        {
-            CheckCenter.IsChecked = false;
-            CheckRight.IsChecked = false;
-        }
-        else if (sender == CheckCenter)
-        {
-            CheckLeft.IsChecked = false;
-            CheckRight.IsChecked = false;
-        }
-        else if (sender == CheckRight)
-        {
-            CheckLeft.IsChecked = false;
-            CheckCenter.IsChecked = false;
-        }
-
-        _changing = false;
+        EnsureSingleSelection(sender, CheckLeft, CheckCenter, CheckRight);
     }
 
     private void CheckVertical_CheckedChanged(object? sender, RoutedEventArgs e)
     {
-        if (_changing) return;
+        EnsureSingleSelection(sender, CheckTop, CheckMiddle, CheckBottom);
+    }
+
+    private void EnsureSingleSelection(object? sender, params CheckBox[] checkBoxes)
+    {
+        if (_changing || sender is not CheckBox senderCheckBox) return;
 
         _changing = true;
 
-        // Ensure only one vertical option is checked
-        if (sender == CheckTop)
+        foreach (var checkBox in checkBoxes)
         {
-            CheckMiddle.IsChecked = false;
-            CheckBottom.IsChecked = false;
-        }
-        else if (sender == CheckMiddle)
-        {
-            CheckTop.IsChecked = false;
-            CheckBottom.IsChecked = false;
-        }
-        else if (sender == CheckBottom)
-        {
-            CheckTop.IsChecked = false;
-            CheckMiddle.IsChecked = false;
+            if (checkBox != senderCheckBox)
+            {
+                checkBox.IsChecked = false;
+            }
         }
 
         _changing = false;

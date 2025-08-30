@@ -15,6 +15,10 @@ namespace SrvSurvey.UI.Avalonia;
 
 public partial class MainWindow : Window
 {
+    private const int CONNECTED_COLOR_R = 92;
+    private const int CONNECTED_COLOR_G = 184;
+    private const int CONNECTED_COLOR_B = 92;
+
     private TextBox? _logsBox;
     private JournalWatcher? _watcher;
     private TextBlock? _txtStatus;
@@ -25,7 +29,8 @@ public partial class MainWindow : Window
     private TextBlock? _txtLatitude;
     private TextBlock? _txtLongitude;
     private ScrollViewer? _logScrollViewer;
-    private GameState _state = new GameState();
+    private readonly GameState _state = new GameState();
+    private readonly Random _random = new Random();
     private JournalProcessor? _processor;
     private Timer? _timeTimer;
     private FloatieWindow? _floatie;
@@ -160,32 +165,50 @@ public partial class MainWindow : Window
 
     private void UpdateGameStatus(GameState s)
     {
-        // Update individual status fields
-        if (_txtSystem != null) _txtSystem.Text = s.StarSystem ?? "Unknown";
-        if (_txtBody != null) _txtBody.Text = s.Body ?? "Unknown";
-        if (_txtLatitude != null) _txtLatitude.Text = s.Latitude?.ToString("F6") ?? "Unknown";
-        if (_txtLongitude != null) _txtLongitude.Text = s.Longitude?.ToString("F6") ?? "Unknown";
+        // Update individual status fields with null safety
+        UpdateTextBlock(_txtSystem, s.StarSystem ?? "Unknown");
+        UpdateTextBlock(_txtBody, s.Body ?? "Unknown");
+        UpdateTextBlock(_txtLatitude, s.Latitude?.ToString("F6") ?? "Unknown");
+        UpdateTextBlock(_txtLongitude, s.Longitude?.ToString("F6") ?? "Unknown");
 
         // Update connection status
+        UpdateConnectionStatus();
+
+        // Update main status bar
+        UpdateMainStatus(s);
+    }
+
+    private void UpdateTextBlock(TextBlock? textBlock, string text)
+    {
+        if (textBlock != null)
+        {
+            textBlock.Text = text;
+        }
+    }
+
+    private void UpdateConnectionStatus()
+    {
         if (_txtConnection != null)
         {
             _txtConnection.Text = "Connected";
-            _txtConnection.Foreground = new SolidColorBrush(Color.FromRgb(92, 184, 92)); // Green
+            _txtConnection.Foreground = new SolidColorBrush(Color.FromRgb(CONNECTED_COLOR_R, CONNECTED_COLOR_G, CONNECTED_COLOR_B));
         }
+    }
 
-        // Update main status bar
-        if (_txtStatus != null)
+    private void UpdateMainStatus(GameState s)
+    {
+        if (_txtStatus == null) return;
+
+        var sys = s.StarSystem ?? "Unknown";
+        var body = s.Body ?? "Unknown";
+
+        if (s.Latitude.HasValue && s.Longitude.HasValue)
         {
-            var sys = s.StarSystem ?? "Unknown";
-            var body = s.Body ?? "Unknown";
-            if (s.Latitude.HasValue && s.Longitude.HasValue)
-            {
-                _txtStatus.Text = $"📍 {sys} > {body} ({s.Latitude:F4}, {s.Longitude:F4})";
-            }
-            else
-            {
-                _txtStatus.Text = $"🚀 {sys} > {body}";
-            }
+            _txtStatus.Text = $"📍 {sys} > {body} ({s.Latitude:F4}, {s.Longitude:F4})";
+        }
+        else
+        {
+            _txtStatus.Text = $"🚀 {sys} > {body}";
         }
     }
     
@@ -228,8 +251,7 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrWhiteSpace(s.StarSystem)) return;
 
-        if (_systemStatus == null)
-            _systemStatus = new SystemStatusOverlay();
+        _systemStatus ??= new SystemStatusOverlay();
 
         var status = s.StarSystem;
         if (!string.IsNullOrWhiteSpace(s.Body))
@@ -238,28 +260,25 @@ public partial class MainWindow : Window
         _systemStatus.UpdateStatus(status, "System Status");
         _systemStatus.ShowOverlay();
     }
-    
+
     private void UpdateBioStatusOverlay(GameState s)
     {
         if (string.IsNullOrWhiteSpace(s.Body)) return;
 
-        if (_bioStatus == null)
-            _bioStatus = new BioStatusOverlay();
+        _bioStatus ??= new BioStatusOverlay();
 
-        // For now, show basic body info
         // Get bio signal count and temperature from game state
         var bioSignalCount = GetBioSignalCount(s.Body);
         var temperature = GetCurrentTemperature();
         _bioStatus.UpdateBioStatus(s.Body, bioSignalCount, temperature);
         _bioStatus.ShowOverlay();
     }
-    
+
     private void UpdateColonyCommoditiesOverlay(GameState s)
     {
         // For now, show sample colony data
-        // TODO: Integrate with actual colony data from journal events 
-        if (_colonyCommodities == null)
-            _colonyCommodities = new ColonyCommoditiesOverlay();
+        // TODO: Integrate with actual colony data from journal events
+        _colonyCommodities ??= new ColonyCommoditiesOverlay();
 
         var sampleCommodities = new Dictionary<string, int>
         {
@@ -278,6 +297,11 @@ public partial class MainWindow : Window
     {
         _timeTimer?.Dispose();
         _watcher?.Stop();
+        // Note: JournalProcessor doesn't implement IDisposable
+        _floatie?.Close();
+        _systemStatus?.Close();
+        _bioStatus?.Close();
+        _colonyCommodities?.Close();
         base.OnClosed(e);
     }
 
@@ -286,13 +310,13 @@ public partial class MainWindow : Window
         // TODO: Parse journal events for bio signals on this body
         // For now, return a random number between 0-5 for demo
         if (string.IsNullOrEmpty(bodyName)) return 0;
-        return new Random().Next(0, 6);
+        return _random.Next(0, 6);
     }
 
     private double? GetCurrentTemperature()
     {
         // TODO: Parse journal events for current temperature
         // For now, return a random temperature between -50 and 50
-        return new Random().Next(-50, 51);
+        return _random.Next(-50, 51);
     }
 }

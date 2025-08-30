@@ -11,6 +11,10 @@ namespace SrvSurvey.UI.Avalonia.Views;
 
 public partial class FormGroundTarget : Window
 {
+    private const string XCLIP_COMMAND = "xclip";
+    private const string XCLIP_ARGS = "-selection clipboard -o";
+    private const string WL_PASTE_COMMAND = "wl-paste";
+
     public LatLong2 Target { get; private set; } = LatLong2.Empty;
     public bool TargetSet { get; private set; } = false;
 
@@ -21,44 +25,56 @@ public partial class FormGroundTarget : Window
 
     private void BtnBegin_Click(object? sender, RoutedEventArgs e)
     {
-                try
+        if (!TryParseCoordinates(out var lat, out var lon))
         {
-            var lat = double.Parse(TxtLat.Text);
-            var lon = double.Parse(TxtLong.Text);
-
-            Target = new LatLong2(lat, lon);
-            TargetSet = true;
-
-            Close();
+            ShowErrorDialog("Invalid coordinates format!", "Please enter valid latitude and longitude values.");
+            return;
         }
-        catch (Exception ex)
+
+        Target = new LatLong2(lat, lon);
+        TargetSet = true;
+        Close();
+    }
+
+    private bool TryParseCoordinates(out double lat, out double lon)
+    {
+        lat = 0;
+        lon = 0;
+
+        if (string.IsNullOrWhiteSpace(TxtLat.Text) || string.IsNullOrWhiteSpace(TxtLong.Text))
         {
-            // Show error message to user
-            var errorDialog = new Window
-            {
-                Title = "Input Error",
-                Width = 300,
-                Height = 150,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            var okButton = new Button { Content = "OK", HorizontalAlignment = HorizontalAlignment.Right };
-            okButton.Click += (s, e) => errorDialog.Close();
-
-            errorDialog.Content = new StackPanel
-            {
-                Margin = new Thickness(20),
-                Spacing = 10,
-                Children =
-                {
-                    new TextBlock { Text = "Invalid coordinates format!", FontWeight = FontWeight.Bold, Foreground = Brushes.Red },
-                    new TextBlock { Text = "Please enter valid latitude and longitude values.", TextWrapping = TextWrapping.Wrap },
-                    okButton
-                }
-            };
-
-            errorDialog.ShowDialog(this);
+            return false;
         }
+
+        return double.TryParse(TxtLat.Text, out lat) && double.TryParse(TxtLong.Text, out lon);
+    }
+
+    private void ShowErrorDialog(string title, string message)
+    {
+        var errorDialog = new Window
+        {
+            Title = "Input Error",
+            Width = 300,
+            Height = 150,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+
+        var okButton = new Button { Content = "OK", HorizontalAlignment = HorizontalAlignment.Right };
+        okButton.Click += (s, e) => errorDialog.Close();
+
+        errorDialog.Content = new StackPanel
+        {
+            Margin = new Thickness(20),
+            Spacing = 10,
+            Children =
+            {
+                new TextBlock { Text = title, FontWeight = FontWeight.Bold, Foreground = Brushes.Red },
+                new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+                okButton
+            }
+        };
+
+        errorDialog.ShowDialog(this);
     }
 
     private void BtnTargetCurrent_Click(object? sender, RoutedEventArgs e)
@@ -104,10 +120,10 @@ public partial class FormGroundTarget : Window
             {
                 var process = new Process
                 {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    StartInfo = new ProcessStartInfo
                     {
-                        FileName = "xclip",
-                        Arguments = "-selection clipboard -o",
+                        FileName = XCLIP_COMMAND,
+                        Arguments = XCLIP_ARGS,
                         RedirectStandardOutput = true,
                         UseShellExecute = false,
                         CreateNoWindow = true
@@ -124,9 +140,9 @@ public partial class FormGroundTarget : Window
                 {
                     var process = new Process
                     {
-                        StartInfo = new System.Diagnostics.ProcessStartInfo
+                        StartInfo = new ProcessStartInfo
                         {
-                            FileName = "wl-paste",
+                            FileName = WL_PASTE_COMMAND,
                             RedirectStandardOutput = true,
                             UseShellExecute = false,
                             CreateNoWindow = true
