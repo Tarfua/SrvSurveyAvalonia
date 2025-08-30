@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using System.Threading;
 using System;
 using Avalonia.Media;
+using SrvSurvey.UI.Avalonia.Views;
 
 namespace SrvSurvey.UI.Avalonia;
 
@@ -26,6 +27,7 @@ public partial class MainWindow : Window
     private GameState _state = new GameState();
     private JournalProcessor? _processor;
     private Timer? _timeTimer;
+    private FloatieWindow? _floatie;
     public MainWindow()
     {
         InitializeComponent();
@@ -51,7 +53,7 @@ public partial class MainWindow : Window
     private void SetupEventHandlers()
     {
         Logging.Message += AppendLog;
-        _state.Changed += s => UpdateGameStatus(s);
+        _state.Changed += s => { UpdateGameStatus(s); ShowFloatieForState(s); };
         AppConfig.SettingsChanged += OnSettingsChanged;
     }
     
@@ -186,6 +188,18 @@ public partial class MainWindow : Window
                 _txtTime.Text = DateTime.Now.ToString("🕒 HH:mm:ss");
             }
         });
+    }
+
+    private void ShowFloatieForState(GameState s)
+    {
+        // Show small overlay when system/body changes
+        var parts = new System.Collections.Generic.List<string>();
+        if (!string.IsNullOrWhiteSpace(s.StarSystem)) parts.Add(s.StarSystem!);
+        if (!string.IsNullOrWhiteSpace(s.Body)) parts.Add(s.Body!);
+        if (parts.Count == 0) return;
+
+        _floatie ??= new FloatieWindow();
+        _floatie.ShowMessage(string.Join(" > ", parts));
     }
     
     protected override void OnClosed(EventArgs e)
