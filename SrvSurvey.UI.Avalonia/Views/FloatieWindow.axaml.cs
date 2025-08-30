@@ -8,7 +8,7 @@ using SrvSurvey.Core;
 
 namespace SrvSurvey.UI.Avalonia.Views;
 
-public partial class FloatieWindow : Window
+public partial class FloatieWindow : OverlayWindowBase
 {
     private TextBlock? _txt;
 
@@ -19,62 +19,11 @@ public partial class FloatieWindow : Window
 
         // Configure as overlay window
         SystemDecorations = SystemDecorations.None;
-        Topmost = true;
-        ShowInTaskbar = false;
-        ShowActivated = false;
-        CanResize = false;
-        IsHitTestVisible = false;
-
-        // Important for overlay behavior
         WindowState = WindowState.Normal;
         WindowStartupLocation = WindowStartupLocation.Manual;
 
         // Set transparent background
         Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
-
-        // Ensure window stays on top
-        EnsureTopmost();
-    }
-
-    private void EnsureTopmost()
-    {
-        // Periodically ensure window stays on top
-        var timer = new Timer(1000);
-        timer.Elapsed += (s, e) =>
-        {
-            if (!Topmost)
-            {
-                Topmost = true;
-                Dispatcher.UIThread.InvokeAsync(() => BringToFront());
-            }
-        };
-        timer.Start();
-    }
-
-    private void BringToFront()
-    {
-        try
-        {
-            if (OperatingSystem.IsLinux())
-            {
-                var process = new System.Diagnostics.Process
-                {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = "wmctrl",
-                        Arguments = $"-r :ACTIVE: -b add,above",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-                process.Start();
-                process.WaitForExit();
-            }
-        }
-        catch
-        {
-            // Ignore errors - fallback to basic Topmost
-        }
     }
 
     public void ShowMessage(string message)

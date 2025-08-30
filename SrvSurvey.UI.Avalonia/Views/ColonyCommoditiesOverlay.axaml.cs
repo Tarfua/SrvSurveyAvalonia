@@ -10,7 +10,7 @@ using SrvSurvey.Core;
 
 namespace SrvSurvey.UI.Avalonia.Views;
 
-public partial class ColonyCommoditiesOverlay : Window
+public partial class ColonyCommoditiesOverlay : OverlayWindowBase
 {
     private TextBlock? _txtHeader;
     private TextBlock? _txtStatus;
@@ -29,24 +29,14 @@ public partial class ColonyCommoditiesOverlay : Window
 
         // Configure as overlay window
         SystemDecorations = SystemDecorations.None;
-        Topmost = true;
-        ShowInTaskbar = false;
-        ShowActivated = false;
-        CanResize = false;
-        IsHitTestVisible = false;
-
-        // Important for overlay behavior
         WindowState = WindowState.Normal;
         WindowStartupLocation = WindowStartupLocation.Manual;
 
         // Set transparent background
         Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
 
-        // Position right side of primary screen
+        // Position based on saved settings or default
         PositionOnScreen();
-
-        // Ensure window stays on top
-        EnsureTopmost();
     }
 
     private void PositionOnScreen()
@@ -80,47 +70,6 @@ public partial class ColonyCommoditiesOverlay : Window
                 var bounds = screen.WorkingArea;
                 Position = new PixelPoint((int)(bounds.X + bounds.Width - Width - 20), (int)(bounds.Y + 100));
             }
-        }
-    }
-
-    private void EnsureTopmost()
-    {
-        // Periodically ensure window stays on top
-        var timer = new Timer(1000);
-        timer.Elapsed += (s, e) =>
-        {
-            if (!Topmost)
-            {
-                Topmost = true;
-                Dispatcher.UIThread.InvokeAsync(() => BringToFront());
-            }
-        };
-        timer.Start();
-    }
-
-    private void BringToFront()
-    {
-        try
-        {
-            if (OperatingSystem.IsLinux())
-            {
-                var process = new System.Diagnostics.Process
-                {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = "wmctrl",
-                        Arguments = $"-r :ACTIVE: -b add,above",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-                process.Start();
-                process.WaitForExit();
-            }
-        }
-        catch
-        {
-            // Ignore errors - fallback to basic Topmost
         }
     }
 

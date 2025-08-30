@@ -8,7 +8,215 @@ using System;
 
 namespace SrvSurvey.UI.Avalonia.Views;
 
-public partial class SystemStatusOverlay : Window
+/// <summary>
+/// Base class for overlay windows with Linux-specific always-on-top behavior
+/// </summary>
+public abstract class OverlayWindowBase : Window
+{
+    private System.Timers.Timer? _overlayMonitorTimer;
+    private bool _isMonitoring = false;
+
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+
+        // Setup overlay behavior after window is opened
+        SetupOverlayBehavior();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        // Clean up resources
+        StopOverlayMonitor();
+        base.OnClosed(e);
+    }
+
+    private void SetupOverlayBehavior()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            // For non-Linux platforms, use basic Topmost
+            Topmost = true;
+            return;
+        }
+
+        // Linux-specific overlay setup
+        SetupLinuxOverlay();
+    }
+
+    private void SetupLinuxOverlay()
+    {
+        // Set basic properties
+        Topmost = true;
+        ShowInTaskbar = false;
+        ShowActivated = false;
+        CanResize = false;
+        IsHitTestVisible = false;
+
+        // Apply window manager hints for better overlay behavior
+        ApplyWindowManagerHints();
+
+        // Start monitoring to maintain overlay state
+        StartOverlayMonitor();
+    }
+
+    private void ApplyWindowManagerHints()
+    {
+        // Method 1: Try wmctrl (most reliable for X11)
+        if (TryWmctrlMethod())
+            return;
+
+        // Method 2: Try xdotool (alternative tool)
+        if (TryXdotoolMethod())
+            return;
+
+        // Method 3: Try xprop with window search
+        TryXpropMethod();
+    }
+
+    private bool TryWmctrlMethod()
+    {
+        try
+        {
+            // Use wmctrl to set window always on top
+            // Wait a bit for window to be fully created
+            System.Threading.Thread.Sleep(100);
+
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "wmctrl",
+                    Arguments = $"-r \"{Title}\" -b add,above",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true
+                }
+            };
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool TryXdotoolMethod()
+    {
+        try
+        {
+            // Use xdotool as alternative
+            System.Threading.Thread.Sleep(100);
+
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "xdotool",
+                    Arguments = $"search --name \"{Title}\" set_window --overrideredirect 1 windowraise",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true
+                }
+            };
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void TryXpropMethod()
+    {
+        try
+        {
+            // Use xprop to find and modify window properties
+            var findProcess = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "xprop",
+                    Arguments = "-root _NET_ACTIVE_WINDOW",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
+
+            findProcess.Start();
+            var output = findProcess.StandardOutput.ReadToEnd();
+            findProcess.WaitForExit();
+
+            if (findProcess.ExitCode == 0 && !string.IsNullOrEmpty(output))
+            {
+                // Could parse window ID and apply properties
+                // For now, rely on other methods
+            }
+        }
+        catch
+        {
+            // xprop method failed
+        }
+    }
+
+    private void StartOverlayMonitor()
+    {
+        if (_isMonitoring) return;
+
+        _overlayMonitorTimer = new System.Timers.Timer(3000); // Check every 3 seconds
+        _overlayMonitorTimer.Elapsed += async (s, e) =>
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                try
+                {
+                    EnsureOverlayState();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Overlay monitor error: {ex.Message}");
+                }
+            });
+        };
+        _overlayMonitorTimer.Start();
+        _isMonitoring = true;
+    }
+
+    private void StopOverlayMonitor()
+    {
+        if (_overlayMonitorTimer != null)
+        {
+            _overlayMonitorTimer.Stop();
+            _overlayMonitorTimer.Dispose();
+            _overlayMonitorTimer = null;
+        }
+        _isMonitoring = false;
+    }
+
+    private void EnsureOverlayState()
+    {
+        // Re-ensure Topmost property
+        if (!Topmost)
+        {
+            Topmost = true;
+        }
+
+        // Additional Linux-specific checks
+        if (OperatingSystem.IsLinux() && IsVisible)
+        {
+            // Periodically reapply window manager hints
+            ApplyWindowManagerHints();
+        }
+    }
+}
+
+public partial class SystemStatusOverlay : OverlayWindowBase
 {
     private TextBlock? _txtStatus;
     private TextBlock? _txtHeader;
@@ -21,13 +229,6 @@ public partial class SystemStatusOverlay : Window
 
         // Configure as overlay window
         SystemDecorations = SystemDecorations.None;
-        Topmost = true;
-        ShowInTaskbar = false;
-        ShowActivated = false;
-        CanResize = false;
-        IsHitTestVisible = false;
-
-        // Important for overlay behavior
         WindowState = WindowState.Normal;
         WindowStartupLocation = WindowStartupLocation.Manual;
 
@@ -36,9 +237,6 @@ public partial class SystemStatusOverlay : Window
 
         // Position based on saved settings or default
         PositionOnScreen();
-
-        // Ensure window stays on top - try platform-specific methods
-        EnsureTopmost();
     }
 
     private void PositionOnScreen()
@@ -72,49 +270,6 @@ public partial class SystemStatusOverlay : Window
                 var bounds = screen.WorkingArea;
                 Position = new PixelPoint((int)(bounds.X + bounds.Width - Width - 20), (int)(bounds.Y + 20));
             }
-        }
-    }
-
-    private void EnsureTopmost()
-    {
-        // Periodically ensure window stays on top
-        var timer = new System.Timers.Timer(1000); // Check every second
-        timer.Elapsed += (s, e) =>
-        {
-            if (!Topmost)
-            {
-                Topmost = true;
-                Dispatcher.UIThread.InvokeAsync(() => BringToFront());
-            }
-        };
-        timer.Start();
-    }
-
-    private void BringToFront()
-    {
-        try
-        {
-            // Try to bring window to front using platform-specific methods
-            if (OperatingSystem.IsLinux())
-            {
-                // For Linux, we can try to use wmctrl or similar
-                var process = new System.Diagnostics.Process
-                {
-                    StartInfo = new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = "wmctrl",
-                        Arguments = $"-r :ACTIVE: -b add,above",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-                process.Start();
-                process.WaitForExit();
-            }
-        }
-        catch
-        {
-            // Ignore errors - fallback to basic Topmost
         }
     }
 
