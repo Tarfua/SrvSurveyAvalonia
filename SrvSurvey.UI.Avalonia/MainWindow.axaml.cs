@@ -29,6 +29,7 @@ public partial class MainWindow : Window
     private Timer? _timeTimer;
     private FloatieWindow? _floatie;
     private SystemStatusOverlay? _systemStatus;
+    private BioStatusOverlay? _bioStatus;
     public MainWindow()
     {
         InitializeComponent();
@@ -204,6 +205,9 @@ public partial class MainWindow : Window
         
         // Update system status overlay
         UpdateSystemStatusOverlay(s);
+        
+        // Update bio status overlay
+        UpdateBioStatusOverlay(s);
     }
     
     private void UpdateSystemStatusOverlay(GameState s)
@@ -218,6 +222,18 @@ public partial class MainWindow : Window
             
         _systemStatus.UpdateStatus(status, "System Status");
         _systemStatus.ShowOverlay();
+    }
+    
+    private void UpdateBioStatusOverlay(GameState s)
+    {
+        if (string.IsNullOrWhiteSpace(s.Body)) return;
+        
+        _bioStatus ??= new BioStatusOverlay();
+        
+        // For now, show basic body info
+        // TODO: Add bio signal count and temperature from journal events
+        _bioStatus.UpdateBioStatus(s.Body, 0, null);
+        _bioStatus.ShowOverlay();
     }
     
     protected override void OnClosed(EventArgs e)
